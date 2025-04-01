@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D T Z   WhatsApp Business Catalog Image Maker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: linear-gradient(45deg, #0f0c29, #302b63, #24243e); height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; transition: all 0.3s ease; }
+        h1 { color: #fff; text-shadow: 0 0 10px cyan; margin-bottom: 20px; }
+        #upload-box { background: rgba(0, 0, 0, 0.5); padding: 20px; border: 2px dashed cyan; border-radius: 10px; text-align: center; width: 80%; max-width: 400px; cursor: pointer; color: #fff; transition: 0.3s; }
+        #upload-box:hover { background: rgba(0, 0, 0, 0.7); }
+        input[type="file"] { display: none; }
+        #preview-container { margin-top: 20px; display: none; flex-direction: column; align-items: center; }
+        #preview-img { max-width: 300px; border: 2px solid cyan; border-radius: 10px; margin-bottom: 10px; }
+        #output { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; }
+        .image-box { display: flex; flex-direction: column; align-items: center; }
+        canvas { border: 2px solid cyan; border-radius: 5px; transition: transform 0.2s; }
+        canvas:hover { transform: scale(1.1); }
+        button { margin-top: 10px; padding: 10px 15px; border: none; background: cyan; color: black; cursor: pointer; font-weight: bold; border-radius: 5px; transition: 0.3s; }
+        button:hover { background: #00ffcc; }
+    </style>
+</head>
+<body>
+
+    <h1>D t z  WhatsApp Business Catalog Image Maker</h1>
+    <label id="upload-box">
+        Click to Upload Image
+        <input type="file" id="file-input" accept="image/*">
+    </label>
+
+    <div id="preview-container">
+        <img id="preview-img" src="" alt="Image Preview">
+        <button id="submit-btn">Generate Catalog Images</button>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImg = document.getElementById('preview-img');
+        const submitBtn = document.getElementById('submit-btn');
+        const outputDiv = document.getElementById('output');
+        let selectedImage = null;
+
+        fileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    selectedImage = e.target.result;
+                    previewImg.src = selectedImage;
+                    previewContainer.style.display = "flex";
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        submitBtn.addEventListener('click', () => {
+            if (selectedImage) {
+                splitImage(selectedImage);
+            }
+        });
+
+        function splitImage(src) {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                const imgWidth = img.width;
+                const imgHeight = img.height;
+                const partWidth = imgWidth / 3;  
+                const partHeight = imgHeight / 2; 
+
+                outputDiv.innerHTML = ""; 
+
+                let partNumber = 1;
+
+                for (let y = 0; y < 2; y++) {
+                    for (let x = 0; x < 3; x++) {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = partWidth;
+                        canvas.height = partHeight;
+
+                        ctx.drawImage(img, x * partWidth, y * partHeight, partWidth, partHeight, 0, 0, partWidth, partHeight);
+
+                        const imgBox = document.createElement('div');
+                        imgBox.classList.add('image-box');
+
+                        const imgElement = document.createElement('canvas');
+                        imgElement.width = partWidth;
+                        imgElement.height = partHeight;
+                        imgElement.getContext('2d').drawImage(canvas, 0, 0);
+
+                        const button = document.createElement("button");
+                        button.textContent = `Download Image ${partNumber}`;
+                        button.onclick = () => {
+                            const link = document.createElement("a");
+                            link.href = canvas.toDataURL();
+                            link.download = `Catalog_${partNumber}.png`;
+                            link.click();
+                        };
+
+                        imgBox.appendChild(imgElement);
+                        imgBox.appendChild(button);
+                        outputDiv.appendChild(imgBox);
+
+                        partNumber++;
+                    }
+                }
+            };
+        }
+    </script>
+
+</body>
+</html>
